@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>شپر باکسِز | SHPRBoxes</title>
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  
+  <!-- Google Material Symbols Rounded CDN -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+  
+  <!-- Custom Stylesheet (Moved to css/ folder) -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- App Header -->
+  <header class="app-header">
+    <div class="header-container">
+      <div class="brand-section">
+        <div class="brand-icon">
+          <span class="material-symbols-rounded">inventory_2</span>
+        </div>
+        <div>
+          <h1 class="brand-title">شپر باکسِز</h1>
+          <p class="brand-subtitle">SHPRBoxes • سامانه مدیریت کارتن‌ها</p>
+        </div>
+      </div>
+
+      <!-- Live Search Bar -->
+      <div class="header-search">
+        <span class="material-symbols-rounded search-icon">search</span>
+        <input type="text" id="globalSearchInput" placeholder="جستجوی کد کارتن، عنوان، یا اقلام داخلی..." autocomplete="off">
+        <button id="clearSearchBtn" class="clear-search-btn" title="پاک کردن جستجو">
+          <span class="material-symbols-rounded">close</span>
+        </button>
+      </div>
+
+      <!-- Header Action Buttons -->
+      <div class="header-actions">
+        <button id="openNewBoxModalBtn" class="btn btn-primary" title="افزودن کارتن جدید">
+          <span class="material-symbols-rounded">add_box</span>
+          <span>کارتن جدید</span>
+        </button>
+
+        <!-- QR Scanner Button -->
+        <button id="openQrScannerModalBtn" class="btn btn-secondary" title="اسکن بارکد QR کارتن">
+          <span class="material-symbols-rounded">qr_code_scanner</span>
+          <span>اسکن QR</span>
+        </button>
+
+        <button id="openLocationsModalBtn" class="btn btn-secondary" title="مدیریت مکان‌ها">
+          <span class="material-symbols-rounded">location_on</span>
+          <span>مکان‌ها</span>
+        </button>
+
+        <button id="openJsonDbModalBtn" class="btn btn-secondary" title="دیتابیس JSON">
+          <span class="material-symbols-rounded">database</span>
+          <span>دیتابیس</span>
+        </button>
+
+        <button id="themeToggleBtn" class="btn btn-secondary btn-icon" title="تغییر حالت شب/روز">
+          <span class="material-symbols-rounded" id="themeIcon">dark_mode</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="main-wrapper">
+    
+    <!-- Quick Statistics Ribbon (Clean 3-Card Layout) -->
+    <section class="stats-ribbon" id="statsRibbon">
+      <div class="stat-card">
+        <div class="stat-icon-wrapper blue">
+          <span class="material-symbols-rounded">all_inbox</span>
+        </div>
+        <div class="stat-info">
+          <h4>تعداد کل کارتن‌ها</h4>
+          <span class="stat-value" id="statTotalBoxes">۰</span>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon-wrapper emerald">
+          <span class="material-symbols-rounded">category</span>
+        </div>
+        <div class="stat-info">
+          <h4>مجموع اقلام ذخیره شده</h4>
+          <span class="stat-value" id="statTotalItems">۰</span>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon-wrapper amber">
+          <span class="material-symbols-rounded">place</span>
+        </div>
+        <div class="stat-info">
+          <h4>تعداد مکان‌های انبارش</h4>
+          <span class="stat-value" id="statTotalLocations">۰</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Filters & Arrangement Controls -->
+    <section class="filter-bar">
+      <!-- Location Chips -->
+      <div class="filter-row">
+        <div class="location-chips-wrapper" id="locationChipsContainer">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
+
+      <!-- Secondary Filters & Arrangement Mode -->
+      <div class="filter-row">
+        <div class="filter-controls">
+          <div class="control-group">
+            <label for="sizeFilterSelect">سایز کارتن:</label>
+            <select id="sizeFilterSelect" class="select-input">
+              <option value="all">همه سایزها (XS تا XL)</option>
+              <option value="1">سایز XS</option>
+              <option value="2">سایز S</option>
+              <option value="3">سایز M</option>
+              <option value="4">سایز L</option>
+              <option value="5">سایز XL</option>
+            </select>
+          </div>
+
+          <div class="control-group">
+            <label for="sortBySelect">مرتب‌سازی:</label>
+            <select id="sortBySelect" class="select-input">
+              <option value="newest">جدیدترین</option>
+              <option value="code">کد شناسه</option>
+              <option value="size">سایز کارتن</option>
+              <option value="itemCount">بیشترین اقلام</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Arrangement View Switcher -->
+        <div class="view-toggle">
+          <button id="viewGridBtn" class="view-toggle-btn active" title="نمایش یکپارچه">
+            <span class="material-symbols-rounded">grid_view</span>
+            <span>شبکه‌ای</span>
+          </button>
+          <button id="viewGroupedBtn" class="view-toggle-btn" title="چینش بر اساس مکان کارتن">
+            <span class="material-symbols-rounded">view_agenda</span>
+            <span>گروه‌بندی مکانی</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Skeleton Loading State (Shown initially / during transitions) -->
+    <div id="skeletonContainer" class="boxes-grid" style="display: none;">
+      <div class="skeleton-card">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <div class="skeleton skeleton-badge"></div>
+          <div class="skeleton" style="width: 70px; height: 50px; border-radius: 8px;"></div>
+        </div>
+        <div class="skeleton skeleton-title"></div>
+        <div class="skeleton skeleton-text" style="width: 80%;"></div>
+        <div class="skeleton skeleton-box-preview"></div>
+        <div class="skeleton skeleton-actions"></div>
+      </div>
+      <div class="skeleton-card">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <div class="skeleton skeleton-badge"></div>
+          <div class="skeleton" style="width: 70px; height: 50px; border-radius: 8px;"></div>
+        </div>
+        <div class="skeleton skeleton-title"></div>
+        <div class="skeleton skeleton-text" style="width: 70%;"></div>
+        <div class="skeleton skeleton-box-preview"></div>
+        <div class="skeleton skeleton-actions"></div>
+      </div>
+      <div class="skeleton-card">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <div class="skeleton skeleton-badge"></div>
+          <div class="skeleton" style="width: 70px; height: 50px; border-radius: 8px;"></div>
+        </div>
+        <div class="skeleton skeleton-title"></div>
+        <div class="skeleton skeleton-text" style="width: 85%;"></div>
+        <div class="skeleton skeleton-box-preview"></div>
+        <div class="skeleton skeleton-actions"></div>
+      </div>
+    </div>
+
+    <!-- Active Boxes Display Area -->
+    <section id="boxesMainContainer">
+      <!-- Injected via JavaScript (Flat Grid or Location Groups with 3D Carton Boxes) -->
+    </section>
+
+    <!-- Empty State Message -->
+    <div id="emptyStateView" class="empty-state-view" style="display: none;">
+      <div class="empty-icon">
+        <span class="material-symbols-rounded">search_off</span>
+      </div>
+      <h3 class="empty-title">کارتنی با این مشخصات یافت نشد</h3>
+      <p class="empty-subtitle">می‌توانید فیلترها را تغییر دهید یا یک کارتن جدید ایجاد نمایید.</p>
+      <button id="emptyStateNewBtn" class="btn btn-primary" style="margin-top: 0.5rem;">
+        <span class="material-symbols-rounded">add_box</span>
+        <span>ایجاد کارتن جدید</span>
+      </button>
+    </div>
+
+  </main>
+
+  <!-- =========================================================================
+       MODALS
+       ========================================================================= -->
+
+  <!-- 1. Box Create / Edit Modal -->
+  <div id="boxModal" class="modal-backdrop">
+    <div class="modal-container">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <span class="material-symbols-rounded text-primary" id="boxModalIcon">add_box</span>
+          <h3 class="modal-title" id="boxModalTitle">افزودن کارتن جدید</h3>
+        </div>
+        <button class="btn btn-ghost btn-icon close-modal-btn" data-modal="boxModal">
+          <span class="material-symbols-rounded">close</span>
+        </button>
+      </div>
+
+      <form id="boxForm">
+        <div class="modal-body">
+          <input type="hidden" id="boxFormId">
+
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label" for="boxFormCode">
+                <span class="material-symbols-rounded">tag</span>
+                شناسه اختصاصی کارتن
+              </label>
+              <div style="display: flex; gap: 0.5rem; align-items: center;">
+                <input type="text" id="boxFormCode" class="form-input" placeholder="مثال: BOX-123" required style="flex: 1;">
+                <button type="button" id="generateRandomCodeBtn" class="btn btn-secondary btn-sm" title="تولید شناسه تصادفی">
+                  <span class="material-symbols-rounded">shuffle</span>
+                  <span>کد تصادفی</span>
+                </button>
+              </div>
+              <span class="form-hint" id="boxFormCodeHint">شناسه یکتا برای چاپ و الصاق برچسب QR</span>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="boxFormLocation">
+                <span class="material-symbols-rounded">place</span>
+                مکان / موقعیت قرارگیری
+              </label>
+              <select id="boxFormLocation" class="form-select" required>
+                <!-- Locations options injected dynamically -->
+              </select>
+            </div>
+
+            <div class="form-group full-width">
+              <label class="form-label" for="boxFormTitle">
+                <span class="material-symbols-rounded">label</span>
+                عنوان یا نام محتوای کارتن
+              </label>
+              <input type="text" id="boxFormTitle" class="form-input" placeholder="مثال: تجهیزات الکترونیکی و بردها" required>
+            </div>
+
+            <!-- Predefined 5 Sizes Selector -->
+            <div class="form-group full-width">
+              <label class="form-label">
+                <span class="material-symbols-rounded">aspect_ratio</span>
+                ابعاد و سایز کارتن (انتخاب از ۵ سایز استاندارد)
+              </label>
+              <input type="hidden" id="boxFormSizeId" value="3">
+              <div class="size-picker-grid" id="sizePickerContainer">
+                <!-- Size cards generated dynamically -->
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="boxFormColor">
+                <span class="material-symbols-rounded">palette</span>
+                برچسب رنگی
+              </label>
+              <select id="boxFormColor" class="form-select">
+                <option value="#3b82f6">آبی استاندارد</option>
+                <option value="#10b981">سبز زمردی</option>
+                <option value="#f59e0b">کهربایی / نارنجی</option>
+                <option value="#8b5cf6">بنفش</option>
+                <option value="#ef4444">قرمز هشدار / کمپ</option>
+                <option value="#06b6d4">فیروزه‌ای</option>
+                <option value="#64748b">خاکستری تیره</option>
+              </select>
+            </div>
+
+            <div class="form-group full-width">
+              <label class="form-label" for="boxFormNotes">
+                <span class="material-symbols-rounded">notes</span>
+                توضیحات و یادداشت تکمیلی (اختیاری)
+              </label>
+              <textarea id="boxFormNotes" class="form-textarea" placeholder="یادداشت‌های احتیاطی، حساسیت به رطوبت، یا جزئیات نگهداری..."></textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary close-modal-btn" data-modal="boxModal">انصراف</button>
+          <button type="submit" class="btn btn-primary" id="saveBoxBtn">
+            <span class="material-symbols-rounded">check</span>
+            <span>ذخیره کارتن</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 2. Box Details & Items Manager Modal -->
+  <div id="boxDetailModal" class="modal-backdrop">
+    <div class="modal-container modal-lg">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <span class="material-symbols-rounded text-primary">folder_open</span>
+          <div>
+            <h3 class="modal-title" id="boxDetailTitle">محتویات کارتن</h3>
+            <span id="boxDetailCodeBadge" class="box-code-badge">BOX-000</span>
+          </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <button id="detailQrBtn" class="btn btn-secondary btn-sm" title="تولید بارکد QR">
+            <span class="material-symbols-rounded">qr_code_2</span>
+            <span>کد QR</span>
+          </button>
+          <button id="detailPrintLabelBtn" class="btn btn-secondary btn-sm" title="چاپ برچسب فیزیکی">
+            <span class="material-symbols-rounded">print</span>
+            <span>چاپ برچسب</span>
+          </button>
+          <button class="btn btn-ghost btn-icon close-modal-btn" data-modal="boxDetailModal">
+            <span class="material-symbols-rounded">close</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="modal-body">
+        <!-- Box Summary Header Bar -->
+        <div class="box-detail-summary-bar">
+          <div class="box-summary-tags">
+            <span class="box-meta-item" id="detailLocationTag">
+              <span class="material-symbols-rounded">place</span>
+              <span id="detailLocationText">-</span>
+            </span>
+            <span class="box-meta-item" id="detailSizeTag">
+              <span class="material-symbols-rounded">aspect_ratio</span>
+              <span id="detailSizeText">-</span>
+            </span>
+            <span class="box-meta-item" id="detailVolumeTag">
+              <span class="material-symbols-rounded">view_in_ar</span>
+              <span id="detailVolumeText">-</span>
+            </span>
+          </div>
+          <button id="toggleAddItemFormBtn" class="btn btn-primary btn-sm">
+            <span class="material-symbols-rounded">add</span>
+            <span>افزودن قلم کالا</span>
+          </button>
+        </div>
+
+        <!-- Add/Edit Item Collapsible Panel -->
+        <div id="itemFormContainer" style="display: none; background: var(--bg-card-subtle); border: 1px dashed var(--primary-border); border-radius: var(--radius-md); padding: 1.15rem; margin-bottom: 1.5rem;">
+          <h4 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.85rem; color: var(--primary);" id="itemFormHeaderTitle">
+            افزودن کالای جدید به این کارتن
+          </h4>
+          <form id="itemForm">
+            <input type="hidden" id="itemFormId">
+            <input type="hidden" id="itemFormBoxId">
+
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="form-label" for="itemFormName">نام کالا / قطعه *</label>
+                <input type="text" id="itemFormName" class="form-input" placeholder="مثال: باتری شارژی قلمی" required>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="itemFormQuantity">تعداد</label>
+                <input type="number" id="itemFormQuantity" class="form-input" value="1" min="1" required>
+              </div>
+
+              <div class="form-group full-width">
+                <label class="form-label" for="itemFormDesc">توضیحات و مشخصات</label>
+                <textarea id="itemFormDesc" class="form-textarea" placeholder="مشخصات، وضعیت کارکرد، شماره سریال، یا یادداشت‌ها..."></textarea>
+              </div>
+
+              <!-- Item Image Field (File or URL) -->
+              <div class="form-group full-width">
+                <label class="form-label">تصویر کالا (اختیاری)</label>
+                <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
+                  <input type="file" id="itemFormFileInput" accept="image/*" style="display: none;">
+                  <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('itemFormFileInput').click()">
+                    <span class="material-symbols-rounded">upload</span>
+                    <span>انتخاب عکس از کامپیوتر</span>
+                  </button>
+                  <input type="url" id="itemFormImageUrl" class="form-input" style="flex: 1; min-width: 220px;" placeholder="یا درج لینک اینترنتی تصویر...">
+                </div>
+                
+                <!-- Preview chosen image -->
+                <div id="itemImagePreviewContainer" style="display: none; align-items: center; gap: 0.75rem; margin-top: 0.65rem;">
+                  <img id="itemImagePreviewImg" src="" alt="پیش‌نمایش" style="width: 50px; height: 50px; object-fit: cover; border-radius: 6px; border: 1px solid var(--border-color);">
+                  <span id="itemImageNameLabel" style="font-size: 0.78rem; color: var(--text-muted);">تصویر انتخاب شد</span>
+                  <button type="button" id="removeImageBtn" class="btn btn-ghost btn-sm" style="color: var(--danger);">
+                    <span class="material-symbols-rounded">delete</span>
+                    <span>حذف عکس</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; gap: 0.65rem; margin-top: 1rem;">
+              <button type="button" id="cancelItemFormBtn" class="btn btn-secondary btn-sm">انصراف</button>
+              <button type="submit" class="btn btn-primary btn-sm">
+                <span class="material-symbols-rounded">save</span>
+                <span>ذخیره قلم</span>
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Box Items List -->
+        <div>
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.85rem;">
+            <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--text-main);">لیست اقلام داخل کارتن</h4>
+            <span id="detailItemsCountBadge" style="font-size: 0.76rem; color: var(--text-muted);">۰ قلم ثبت شده</span>
+          </div>
+
+          <div id="boxItemsList" class="items-list-container">
+            <!-- Items injected dynamically -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. QR Code Generator & Label Card Modal -->
+  <div id="qrCodeModal" class="modal-backdrop">
+    <div class="modal-container" style="max-width: 480px;">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <span class="material-symbols-rounded text-primary">qr_code_2</span>
+          <h3 class="modal-title">تولید بارکد QR کارتن</h3>
+        </div>
+        <button class="btn btn-ghost btn-icon close-modal-btn" data-modal="qrCodeModal">
+          <span class="material-symbols-rounded">close</span>
+        </button>
+      </div>
+
+      <div class="modal-body" style="text-align: center;">
+        <p style="font-size: 0.84rem; color: var(--text-muted); margin-bottom: 1.25rem;">
+          بارکد QR زیر شامل کد و مشخصات کارتن بوده و متن کارتن نیز دقیقاً در زیر تصویر بارکد درج شده است.
+        </p>
+
+        <!-- Composite QR Canvas Container -->
+        <div class="qr-card-view" id="qrCompositeCard">
+          <canvas id="qrCompositeCanvas" width="300" height="370" style="max-width: 100%; height: auto; border-radius: 8px;"></canvas>
+        </div>
+      </div>
+
+      <div class="modal-footer" style="justify-content: space-between;">
+        <button type="button" class="btn btn-secondary close-modal-btn" data-modal="qrCodeModal">بستن</button>
+        <div style="display: flex; gap: 0.5rem;">
+          <button type="button" class="btn btn-secondary btn-sm" id="downloadQrImageBtn">
+            <span class="material-symbols-rounded">download</span>
+            <span>دانلود تصویر QR</span>
+          </button>
+          <button type="button" class="btn btn-primary btn-sm" id="printQrCardBtn">
+            <span class="material-symbols-rounded">print</span>
+            <span>چاپ</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. QR Code Live & Image Scanner Modal -->
+  <div id="qrScannerModal" class="modal-backdrop">
+    <div class="modal-container" style="max-width: 520px;">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <span class="material-symbols-rounded text-primary">qr_code_scanner</span>
+          <h3 class="modal-title">اسکن بارکد QR کارتن</h3>
+        </div>
+        <button class="btn btn-ghost btn-icon close-modal-btn" data-modal="qrScannerModal" id="closeScannerModalBtn">
+          <span class="material-symbols-rounded">close</span>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Scanner Tabs (Camera vs Image Upload) -->
+        <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.65rem;">
+          <button type="button" id="scannerTabCamBtn" class="btn btn-primary btn-sm">
+            <span class="material-symbols-rounded">photo_camera</span>
+            <span>دوربین زنده</span>
+          </button>
+          <button type="button" id="scannerTabFileBtn" class="btn btn-secondary btn-sm">
+            <span class="material-symbols-rounded">image</span>
+            <span>آپلود تصویر بارکد</span>
+          </button>
+        </div>
+
+        <!-- Camera Scanner Section -->
+        <div id="scannerCameraSection">
+          <div class="scanner-viewport-wrapper">
+            <video id="scannerVideo" class="scanner-video" playsinline></video>
+            <div class="scanner-overlay-aim">
+              <div class="scanner-aim-line"></div>
+            </div>
+          </div>
+          <p id="scannerCameraStatus" style="font-size: 0.8rem; color: var(--text-muted); text-align: center; margin-top: 0.75rem;">
+            دوربین را مقابل برچسب QR کارتن بگیرید...
+          </p>
+        </div>
+
+        <!-- Image Upload Scanner Section -->
+        <div id="scannerFileSection" style="display: none;">
+          <div class="scanner-dropzone" id="scannerDropzone" onclick="document.getElementById('scannerFileInput').click()">
+            <span class="material-symbols-rounded" style="font-size: 40px; color: var(--primary); margin-bottom: 0.5rem;">upload_file</span>
+            <h4 style="font-size: 0.92rem; font-weight: 700; margin-bottom: 0.35rem;">تصویر بارکد QR را انتخاب یا اینجا رها کنید</h4>
+            <p style="font-size: 0.78rem; color: var(--text-muted);">پشتیبانی از فرمت‌های JPG, PNG, WebP و اسکرین‌شات</p>
+          </div>
+          <input type="file" id="scannerFileInput" accept="image/*" style="display: none;">
+        </div>
+
+        <!-- Hidden canvas for image decoding -->
+        <canvas id="scannerHiddenCanvas" style="display: none;"></canvas>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary close-modal-btn" data-modal="qrScannerModal">انصراف</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. Locations Management Modal -->
+  <div id="locationsModal" class="modal-backdrop">
+    <div class="modal-container">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <span class="material-symbols-rounded text-primary">location_on</span>
+          <h3 class="modal-title">مدیریت مکان‌های انبارش</h3>
+        </div>
+        <button class="btn btn-ghost btn-icon close-modal-btn" data-modal="locationsModal">
+          <span class="material-symbols-rounded">close</span>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <!-- New Location Form -->
+        <form id="newLocationForm" style="background: var(--bg-card-subtle); padding: 1rem; border-radius: var(--radius-md); border: 1px solid var(--border-color); margin-bottom: 1.25rem;">
+          <h4 style="font-size: 0.88rem; font-weight: 700; margin-bottom: 0.75rem;">تعریف مکان جدید</h4>
+          <div class="form-grid" style="margin-bottom: 0.75rem;">
+            <div class="form-group">
+              <input type="text" id="locFormName" class="form-input" placeholder="نام مکان (مثال: اتاق خواب طبقه بالا)" required>
+            </div>
+            <div class="form-group">
+              <input type="text" id="locFormDesc" class="form-input" placeholder="توضیح کوتاه (مثال: کمد دیواری سمت راست)">
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary btn-sm">
+            <span class="material-symbols-rounded">add</span>
+            <span>ثبت مکان جدید</span>
+          </button>
+        </form>
+
+        <!-- Existing Locations List -->
+        <div>
+          <h4 style="font-size: 0.88rem; font-weight: 700; margin-bottom: 0.65rem; color: var(--text-muted);">مکان‌های موجود</h4>
+          <div id="locationsListContainer" style="display: flex; flex-direction: column; gap: 0.5rem;">
+            <!-- Locations injected dynamically -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. JSON Database Import / Export Modal -->
+  <div id="jsonDbModal" class="modal-backdrop">
+    <div class="modal-container">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <span class="material-symbols-rounded text-primary">database</span>
+          <h3 class="modal-title">پایگاه داده لوکال JSON</h3>
+        </div>
+        <button class="btn btn-ghost btn-icon close-modal-btn" data-modal="jsonDbModal">
+          <span class="material-symbols-rounded">close</span>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 1.25rem; line-height: 1.7;">
+          تمام تغییرات شما به صورت آنی در حافظه ذخیره می‌شوند. سیستم مجهز به بازیابی خودکار بوده و در صورت عدم وجود فایل <code style="direction:ltr; display:inline-block; background:var(--bg-card-subtle); padding:2px 6px; border-radius:4px;">data/data.json</code>، به طور خودکار پایگاه داده اولیه را برای شما ایجاد می‌کند.
+        </p>
+
+        <div style="display: flex; flex-direction: column; gap: 1rem;">
+          <!-- Export / Download -->
+          <div style="border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1.15rem; background: var(--bg-card-subtle);">
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap;">
+              <div>
+                <h4 style="font-size: 0.95rem; font-weight: 700;">دریافت خروجی JSON (دانلود دیتابیس)</h4>
+                <p style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.2rem;">
+                  فایل کامل کارتن‌ها، اقلام و مکان‌ها به صورت فایل data.json
+                </p>
+              </div>
+              <button id="downloadJsonBtn" class="btn btn-primary btn-sm">
+                <span class="material-symbols-rounded">download</span>
+                <span>دانلود فایل data.json</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Import / Upload -->
+          <div style="border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1.15rem; background: var(--bg-card-subtle);">
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap;">
+              <div>
+                <h4 style="font-size: 0.95rem; font-weight: 700;">بارگذاری فایل JSON (Import)</h4>
+                <p style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.2rem;">
+                  جایگزینی داده‌های فعلی با یک فایل JSON دلخواه
+                </p>
+              </div>
+              <div>
+                <input type="file" id="uploadJsonFileInput" accept=".json" style="display: none;">
+                <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('uploadJsonFileInput').click()">
+                  <span class="material-symbols-rounded">upload_file</span>
+                  <span>انتخاب فایل JSON</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Reset to defaults -->
+          <div style="border: 1px dashed var(--border-color); border-radius: var(--radius-md); padding: 1rem; text-align: left;">
+            <button id="resetDatabaseBtn" class="btn btn-danger btn-sm">
+              <span class="material-symbols-rounded">restart_alt</span>
+              <span>بازنشانی به داده‌های اولیه</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 7. Printable Physical Box Label Modal -->
+  <div id="printLabelModal" class="modal-backdrop">
+    <div class="modal-container">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <span class="material-symbols-rounded text-primary">print</span>
+          <h3 class="modal-title">پیش‌نمایش برچسب فیزیکی کارتن</h3>
+        </div>
+        <button class="btn btn-ghost btn-icon close-modal-btn" data-modal="printLabelModal">
+          <span class="material-symbols-rounded">close</span>
+        </button>
+      </div>
+
+      <div class="modal-body" id="printableLabelContentArea">
+        <!-- Rendered dynamically -->
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary close-modal-btn" data-modal="printLabelModal">بستن</button>
+        <button type="button" class="btn btn-primary" id="printLabelActionBtn">
+          <span class="material-symbols-rounded">print</span>
+          <span>چاپ برچسب (Print)</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 8. Image Lightbox Modal -->
+  <div id="imageLightboxModal" class="modal-backdrop" onclick="this.classList.remove('active')">
+    <div style="max-width: 90vw; max-height: 90vh; position: relative;" onclick="event.stopPropagation()">
+      <button class="btn btn-secondary btn-icon" style="position: absolute; top: -14px; left: -14px; border-radius: 50%; z-index: 10;" onclick="document.getElementById('imageLightboxModal').classList.remove('active')">
+        <span class="material-symbols-rounded">close</span>
+      </button>
+      <img id="lightboxImg" class="image-lightbox-img" src="" alt="بزرگنمایی تصویر">
+    </div>
+  </div>
+
+  <!-- Global Action Spinner Overlay -->
+  <div id="globalLoadingOverlay" class="global-loading-overlay">
+    <div class="spinner spinner-lg"></div>
+    <span id="loadingMessage" style="font-size: 0.95rem;">در حال بارگذاری...</span>
+  </div>
+
+  <!-- Toast Messages Container -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <!-- 9. Custom Delete Confirmation Modal with Double-Check & Warning -->
+  <div id="customDeleteModal" class="modal-backdrop">
+    <div class="modal-container" style="max-width: 440px;">
+      <div class="modal-header" style="background: var(--danger-light); border-bottom-color: rgba(239, 68, 68, 0.25);">
+        <div class="modal-title-group">
+          <span class="material-symbols-rounded" style="color: var(--danger); font-size: 26px;">warning</span>
+          <h3 class="modal-title" style="color: var(--danger);" id="deleteModalTitle">تایید حذف دائمی</h3>
+        </div>
+        <button class="btn btn-ghost btn-icon close-modal-btn" data-modal="customDeleteModal">
+          <span class="material-symbols-rounded">close</span>
+        </button>
+      </div>
+
+      <div class="modal-body" style="text-align: center; padding: 1.5rem 1.25rem;">
+        <div style="width: 60px; height: 60px; border-radius: 50%; background: var(--danger-light); color: var(--danger); display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; font-size: 32px;">
+          <span class="material-symbols-rounded" style="font-size: 34px;">delete_forever</span>
+        </div>
+
+        <h4 style="font-size: 1.05rem; font-weight: 700; margin-bottom: 0.35rem;" id="deleteTargetName">-</h4>
+        <p style="font-size: 0.84rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 1.15rem;" id="deleteTargetDesc">
+          -
+        </p>
+
+        <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: var(--radius-md); padding: 0.85rem; text-align: right; margin-bottom: 1.25rem; display: flex; align-items: flex-start; gap: 0.65rem;">
+          <span class="material-symbols-rounded" style="color: var(--danger); font-size: 20px; flex-shrink: 0; margin-top: 2px;">error</span>
+          <div style="font-size: 0.8rem; color: #991b1b; line-height: 1.5;">
+            <strong>اخطار:</strong> این عملیات دائمی و غیرقابل بازگشت است. اطلاعات به طور کامل از سیستم پاک خواهد شد.
+          </div>
+        </div>
+
+        <label style="display: flex; align-items: center; gap: 0.6rem; cursor: pointer; justify-content: center; font-size: 0.84rem; font-weight: 700; color: var(--text-main); user-select: none;">
+          <input type="checkbox" id="deleteConfirmCheckbox" style="width: 18px; height: 18px; accent-color: var(--danger); cursor: pointer;">
+          <span>تایید می‌کنم و مطلعم که غیرقابل بازگشت است</span>
+        </label>
+      </div>
+
+      <div class="modal-footer" style="justify-content: space-between;">
+        <button type="button" class="btn btn-secondary close-modal-btn" data-modal="customDeleteModal">انصراف</button>
+        <button type="button" class="btn btn-danger" id="executeDeleteBtn" disabled>
+          <span class="material-symbols-rounded">delete_forever</span>
+          <span>حذف نهایی</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile Bottom Navigation Bar -->
+  <nav class="mobile-bottom-nav">
+    <button class="bottom-nav-item highlight-primary" id="mobileNewBoxBtn" title="کارتن جدید">
+      <span class="material-symbols-rounded">add_box</span>
+      <span>کارتن جدید</span>
+    </button>
+    <button class="bottom-nav-item" id="mobileScanQrBtn" title="اسکن QR">
+      <span class="material-symbols-rounded">qr_code_scanner</span>
+      <span>اسکن QR</span>
+    </button>
+    <button class="bottom-nav-item" id="mobileLocationsBtn" title="مکان‌ها">
+      <span class="material-symbols-rounded">location_on</span>
+      <span>مکان‌ها</span>
+    </button>
+    <button class="bottom-nav-item" id="mobileDatabaseBtn" title="دیتابیس">
+      <span class="material-symbols-rounded">database</span>
+      <span>دیتابیس</span>
+    </button>
+    <button class="bottom-nav-item" id="mobileThemeBtn" title="تغییر تم">
+      <span class="material-symbols-rounded" id="mobileThemeIcon">dark_mode</span>
+      <span>تم</span>
+    </button>
+  </nav>
+
+  <!-- Core JavaScript Libraries & App Engine (Moved to js/ folder) -->
+  <script src="js/qrcode.min.js"></script>
+  <script src="js/jsqr.min.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

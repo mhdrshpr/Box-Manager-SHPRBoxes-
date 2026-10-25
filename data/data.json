@@ -1,0 +1,203 @@
+{
+  "settings": {
+    "sizes": [
+      {
+        "id": 1,
+        "name": "سایز ۱ (خیلی کوچک - XS)",
+        "code": "XS",
+        "dimensions": "20 × 15 × 10 cm",
+        "volume": "3 لیتر",
+        "visualScale": 0.8,
+        "icon": "inventory_2"
+      },
+      {
+        "id": 2,
+        "name": "سایز ۲ (کوچک - S)",
+        "code": "S",
+        "dimensions": "30 × 20 × 15 cm",
+        "volume": "9 لیتر",
+        "visualScale": 0.9,
+        "icon": "inventory_2"
+      },
+      {
+        "id": 3,
+        "name": "سایز ۳ (متوسط - M)",
+        "code": "M",
+        "dimensions": "40 × 30 × 25 cm",
+        "volume": "30 لیتر",
+        "visualScale": 1.0,
+        "icon": "inventory_2"
+      },
+      {
+        "id": 4,
+        "name": "سایز ۴ (بزرگ - L)",
+        "code": "L",
+        "dimensions": "50 × 40 × 35 cm",
+        "volume": "70 لیتر",
+        "visualScale": 1.15,
+        "icon": "inventory_2"
+      },
+      {
+        "id": 5,
+        "name": "سایز ۵ (خیلی بزرگ - XL)",
+        "code": "XL",
+        "dimensions": "65 × 50 × 45 cm",
+        "volume": "145 لیتر",
+        "visualScale": 1.3,
+        "icon": "inventory_2"
+      }
+    ]
+  },
+  "locations": [
+    { "id": "loc-1", "name": "انباری اصلی", "icon": "warehouse", "description": "طبقه همکف جنب آسانسور" },
+    { "id": "loc-2", "name": "اتاق کار", "icon": "workspaces", "description": "کمد دیواری سمت راست" },
+    { "id": "loc-3", "name": "کمد دیواری پذیرایی", "icon": "door_sliding", "description": "طبقه بالای قفسه‌ها" },
+    { "id": "loc-4", "name": "پارکینگ", "icon": "garage", "description": "باکس فلزی شماره ۳" }
+  ],
+  "boxes": [
+    {
+      "id": "box-1",
+      "code": "BOX-101",
+      "title": "ابزارآلات برقی و کابل‌ها",
+      "locationId": "loc-1",
+      "sizeId": 3,
+      "color": "#3b82f6",
+      "notes": "وسایل برقی سبک و کابل‌های رابط",
+      "createdAt": "2026-10-10",
+      "items": [
+        {
+          "id": "item-101-1",
+          "name": "دریل پیچ‌گوشتی شارژی",
+          "description": "دریل ۱۲ ولت به همراه ۲ باتری و شارژر فابریک",
+          "quantity": 1,
+          "image": ""
+        },
+        {
+          "id": "item-101-2",
+          "name": "مجموعه کابل HDMI و DisplayPort",
+          "description": "۴ رشته کابل انتقال تصویر با طول‌های مختلف",
+          "quantity": 4,
+          "image": ""
+        },
+        {
+          "id": "item-101-3",
+          "name": "هویه و قلع کش",
+          "description": "هویه ۶۰ وات با پایه نگهدارنده و سیم لحیم",
+          "quantity": 2,
+          "image": ""
+        }
+      ]
+    },
+    {
+      "id": "box-2",
+      "code": "BOX-102",
+      "title": "کتاب‌ها و مدارک قدیمی",
+      "locationId": "loc-2",
+      "sizeId": 4,
+      "color": "#10b981",
+      "notes": "کتاب‌های مهندسی و اسناد بایگانی شده",
+      "createdAt": "2026-10-12",
+      "items": [
+        {
+          "id": "item-102-1",
+          "name": "کتاب‌های مرجع طراحی نرم‌افزار",
+          "description": "۵ جلد کتاب معماری و الگوهای طراحی",
+          "quantity": 5,
+          "image": ""
+        },
+        {
+          "id": "item-102-2",
+          "name": "دفترچه خاطرات و یادداشت‌ها",
+          "description": "دفترچه‌های سال ۱۳۹۸ تا ۱۴۰۲",
+          "quantity": 3,
+          "image": ""
+        }
+      ]
+    },
+    {
+      "id": "box-3",
+      "code": "BOX-103",
+      "title": "لوازم دکوری و نورپردازی جشن",
+      "locationId": "loc-3",
+      "sizeId": 2,
+      "color": "#f59e0b",
+      "notes": "ریسه‌های ال‌ای‌دی و شمع‌ها",
+      "createdAt": "2026-10-14",
+      "items": [
+        {
+          "id": "item-103-1",
+          "name": "ریسه ال‌ای‌دی آفتابی ۱۰ متری",
+          "description": "ریسه سوزنی با آداپتور ۲۲۰ ولت",
+          "quantity": 3,
+          "image": ""
+        },
+        {
+          "id": "item-103-2",
+          "name": "شمع‌های معطر استوانه‌ای",
+          "description": "شمع‌های وانیل و دارچین",
+          "quantity": 6,
+          "image": ""
+        }
+      ]
+    },
+    {
+      "id": "box-4",
+      "code": "BOX-104",
+      "title": "قطعات الکترونیکی و بردها",
+      "locationId": "loc-2",
+      "sizeId": 1,
+      "color": "#8b5cf6",
+      "notes": "بردهای آردوینو، سنسورها و قطعات SMD",
+      "createdAt": "2026-10-15",
+      "items": [
+        {
+          "id": "item-104-1",
+          "name": "میکروکنترلر ESP32 و Arduino Uno",
+          "description": "برد توسعه وای‌فای و بلوتوث با ماژول‌های کمکی",
+          "quantity": 4,
+          "image": ""
+        },
+        {
+          "id": "item-104-2",
+          "name": "جعبه مقاومت‌ها و خازن‌ها",
+          "description": "ارگانایزر قطعات با تفکیک مقادیر مختلف",
+          "quantity": 1,
+          "image": ""
+        }
+      ]
+    },
+    {
+      "id": "box-5",
+      "code": "BOX-105",
+      "title": "تجهیزات کمپینگ و چادر سفری",
+      "locationId": "loc-4",
+      "sizeId": 5,
+      "color": "#ef4444",
+      "notes": "چادر ۴ نفره، کیسه خواب و زیرانداز ضدآب",
+      "createdAt": "2026-10-16",
+      "items": [
+        {
+          "id": "item-105-1",
+          "name": "چادر مسافرتی عصایی ۴ نفره",
+          "description": "چادر دوپوش ضد آب با میخ و طناب مهار",
+          "quantity": 1,
+          "image": ""
+        },
+        {
+          "id": "item-105-2",
+          "name": "کیسه خواب پر منفی ۵ درجه",
+          "description": "کیسه خواب سبک کوهنوردی",
+          "quantity": 2,
+          "image": ""
+        },
+        {
+          "id": "item-105-3",
+          "name": "اجاق گاز سفری کپسولی",
+          "description": "سرشعله تیتانیومی مسافرتی به همراه ۲ کپسول گاز",
+          "quantity": 1,
+          "image": ""
+        }
+      ]
+    }
+  ]
+}
